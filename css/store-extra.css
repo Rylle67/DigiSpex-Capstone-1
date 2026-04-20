@@ -1,0 +1,841 @@
+.packages-hero {
+  padding: 3rem 0 2rem;
+  text-align: center;
+}
+
+.pkg-section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .7rem;
+  letter-spacing: .15em;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.packages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 3rem;
+}
+
+.package-card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform .2s, border-color .25s, box-shadow .25s;
+  cursor: pointer;
+  position: relative;
+}
+
+.package-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--pc-color, var(--accent));
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .5);
+}
+
+.package-card.featured {
+  border-color: var(--pc-color, var(--accent));
+}
+
+.package-card-banner {
+  height: 5px;
+  background: var(--pc-color, var(--accent));
+}
+
+.featured-ribbon {
+  position: absolute;
+  top: 16px;
+  right: -28px;
+  background: var(--pc-color, var(--accent));
+  color: #fff;
+  font-size: .62rem;
+  font-weight: 800;
+  padding: 3px 36px;
+  transform: rotate(45deg);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.package-card-body {
+  padding: 1.35rem;
+}
+
+.package-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.55rem;
+  letter-spacing: .04em;
+  color: var(--pc-color, var(--text));
+  margin-bottom: .2rem;
+}
+
+.package-tagline {
+  font-size: .8rem;
+  color: var(--text2);
+  margin-bottom: .9rem;
+}
+
+.package-includes {
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+  margin-bottom: 1.1rem;
+}
+
+.pkg-include-row {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  font-size: .78rem;
+  color: var(--text2);
+}
+
+.pkg-include-row .dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--pc-color, var(--accent));
+  flex-shrink: 0;
+}
+
+.package-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: .7rem;
+  margin-bottom: .9rem;
+  flex-wrap: wrap;
+}
+
+.pkg-price-now {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--pc-color, var(--accent));
+}
+
+.pkg-btn-row {
+  display: flex;
+  gap: .55rem;
+}
+
+.btn-pkg-customize {
+  flex: 1;
+  padding: .5rem;
+  background: rgba(0, 0, 0, .3);
+  border: 1px solid var(--pc-color, var(--border2));
+  border-radius: 8px;
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--pc-color, var(--text));
+  cursor: pointer;
+  transition: all .18s;
+}
+
+.btn-pkg-customize:hover {
+  background: rgba(0, 0, 0, .5);
+}
+
+.btn-pkg-grab {
+  flex: 1;
+  padding: .5rem;
+  background: var(--pc-color, var(--accent));
+  border: none;
+  border-radius: 8px;
+  font-size: .8rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: filter .18s;
+}
+
+.btn-pkg-grab:hover {
+  filter: brightness(1.15);
+}
+
+/* Package customizer */
+.pkg-customizer {
+  display: grid;
+  grid-template-columns: 1fr 270px;
+  gap: 1.25rem;
+  max-height: 72vh;
+}
+
+.pkg-cust-slots {
+  overflow-y: auto;
+  padding-right: .4rem;
+}
+
+.pkg-cust-slot {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .9rem;
+  margin-bottom: .65rem;
+}
+
+.pkg-slot-hd {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: .55rem;
+}
+
+.pkg-slot-label {
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+.pkg-slot-item {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+}
+
+.pkg-slot-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.pkg-slot-name {
+  font-weight: 600;
+  font-size: .83rem;
+  line-height: 1.3;
+}
+
+.pkg-slot-specs {
+  font-size: .7rem;
+  color: var(--text3);
+}
+
+.pkg-slot-price {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .82rem;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.btn-pkg-swap {
+  padding: .28rem .6rem;
+  background: var(--s3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: .73rem;
+  font-weight: 600;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all .18s;
+}
+
+.btn-pkg-swap:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.pkg-cust-summary {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.15rem;
+  position: sticky;
+  top: 0;
+  align-self: start;
+}
+
+.pkg-sum-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.15rem;
+  letter-spacing: .04em;
+  margin-bottom: .9rem;
+}
+
+.pkg-sum-rows {
+  margin-bottom: .75rem;
+}
+
+.pkg-sum-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: .77rem;
+  color: var(--text2);
+  padding: .28rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.pkg-sum-row:last-child {
+  border-bottom: none;
+}
+
+.pkg-sum-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--text);
+  padding: .65rem 0;
+  border-top: 1px solid var(--border2);
+  margin-top: .4rem;
+}
+
+.btn-pkg-add-all {
+  width: 100%;
+  padding: .6rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: .88rem;
+  cursor: pointer;
+  transition: filter .18s;
+}
+
+.btn-pkg-add-all:hover {
+  filter: brightness(1.12);
+}
+
+.btn-pkg-build-use {
+  width: 100%;
+  padding: .5rem;
+  background: rgba(37, 99, 235, .08);
+  color: var(--accent);
+  border: 1px solid rgba(37, 99, 235, .2);
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: .8rem;
+  cursor: pointer;
+  transition: all .18s;
+  margin-top: .45rem;
+}
+
+.btn-pkg-build-use:hover {
+  background: rgba(37, 99, 235, .16);
+}
+
+/* Swap list */
+.pkg-swap-list {
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.pkg-swap-item {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .7rem;
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  cursor: pointer;
+  transition: all .18s;
+}
+
+.pkg-swap-item:hover {
+  border-color: var(--accent);
+  background: rgba(37, 99, 235, .04);
+}
+
+.pkg-swap-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.pkg-swap-name {
+  font-size: .8rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.pkg-swap-spec {
+  font-size: .68rem;
+  color: var(--text3);
+}
+
+.pkg-swap-price {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .8rem;
+  color: var(--accent);
+}
+
+/* Laptops */
+.laptop-filter-tags {
+  display: flex;
+  gap: .45rem;
+  flex-wrap: wrap;
+  margin: 1rem 0 1.35rem;
+}
+
+.laptop-tag {
+  padding: .32rem .85rem;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  font-size: .77rem;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all .18s;
+}
+
+.laptop-tag:hover {
+  border-color: var(--border2);
+  color: var(--text);
+}
+
+.laptop-tag.active {
+  background: rgba(37, 99, 235, .1);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.laptop-sort-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.laptop-sort-row .search-bar {
+  flex: 1;
+  margin: 0;
+}
+
+.laptop-sort-row .sort-select {
+  margin: 0;
+}
+
+/* ── Laptop grid — horizontal cards matching product screenshot ── */
+.laptops-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Each card: image on the left, details on the right */
+.laptop-card {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform .2s, border-color .2s, box-shadow .2s;
+  position: relative;
+  min-height: 140px;
+}
+
+.laptop-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(37, 99, 235, .35);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, .45);
+}
+
+/* Left image column — fixed width */
+.laptop-card-img-col {
+  flex-shrink: 0;
+  width: 190px;
+  min-height: 140px;
+  background: var(--s3);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.laptop-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .3s;
+}
+
+.laptop-card:hover .laptop-card-img {
+  transform: scale(1.04);
+}
+
+.laptop-card-img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: .4;
+}
+
+/* Right details column */
+.laptop-card-body {
+  flex: 1;
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: .18rem;
+}
+
+/* Use badge sits inline in the card body (not absolute) */
+.laptop-use-badge {
+  font-size: .58rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  display: inline-block;
+  align-self: flex-start;
+  margin-bottom: .2rem;
+}
+
+.badge-gaming {
+  background: rgba(239, 68, 68, .2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, .3);
+}
+
+.badge-creator {
+  background: rgba(168, 85, 247, .2);
+  color: #a855f7;
+  border: 1px solid rgba(168, 85, 247, .3);
+}
+
+.badge-ultrabook {
+  background: rgba(37, 99, 235, .15);
+  color: var(--accent);
+  border: 1px solid rgba(37, 99, 235, .25);
+}
+
+.badge-office {
+  background: rgba(34, 197, 94, .15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, .25);
+}
+
+.badge-budget {
+  background: rgba(245, 158, 11, .15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, .25);
+}
+
+.laptop-brand {
+  font-size: .64rem;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+.laptop-name {
+  font-weight: 600;
+  font-size: .96rem;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.laptop-specs {
+  font-size: .72rem;
+  color: var(--text2);
+}
+
+.laptop-footer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: .45rem;
+}
+
+.laptop-price {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.btn-laptop-add {
+  padding: .38rem .9rem;
+  background: rgba(37, 99, 235, .1);
+  border: 1px solid rgba(37, 99, 235, .25);
+  border-radius: 7px;
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+  transition: all .18s;
+  white-space: nowrap;
+}
+
+.btn-laptop-add:hover:not(:disabled) {
+  background: var(--accent);
+  color: #fff;
+}
+
+.spec-chip {
+  font-size: .61rem;
+  padding: 2px 7px;
+  background: var(--s3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text3);
+}
+
+.laptop-spec-chips {
+  display: flex;
+  gap: .3rem;
+  flex-wrap: wrap;
+  margin: .2rem 0 .1rem;
+}
+
+@media(max-width:560px) {
+  .laptop-card {
+    flex-direction: column;
+    min-height: unset;
+  }
+
+  .laptop-card-img-col {
+    width: 100%;
+    height: 160px;
+  }
+}
+
+/* laptop detail */
+.laptop-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.35rem;
+}
+
+.laptop-detail-info h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.7rem;
+  letter-spacing: .03em;
+  margin-bottom: .35rem;
+}
+
+.laptop-detail-price {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: .85rem;
+}
+
+.laptop-spec-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .8rem;
+}
+
+.laptop-spec-table td {
+  padding: .38rem .45rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+
+.laptop-spec-table td:first-child {
+  color: var(--text3);
+  width: 38%;
+}
+
+/* Nav badges */
+.nav-tab-new {
+  font-size: .54rem;
+  font-weight: 800;
+  background: var(--accent);
+  color: #fff;
+  padding: 1px 5px;
+  border-radius: 3px;
+  vertical-align: top;
+  margin-left: 3px;
+}
+
+.nav-tab-pkg {
+  font-size: .54rem;
+  font-weight: 800;
+  background: #22c55e;
+  color: #fff;
+  padding: 1px 5px;
+  border-radius: 3px;
+  vertical-align: top;
+  margin-left: 3px;
+}
+
+/* Services strip */
+.services-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+}
+
+.service-tile {
+  background: var(--surface);
+  padding: 1.15rem 1rem;
+  text-align: center;
+}
+
+.service-label {
+  font-size: .8rem;
+  font-weight: 600;
+  margin-bottom: .12rem;
+}
+
+.service-sub {
+  font-size: .68rem;
+  color: var(--text3);
+}
+
+/* Package categories */
+.pkg-cat-strip {
+  display: flex;
+  gap: .65rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.65rem;
+}
+
+.pkg-cat-btn {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .42rem 1rem;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: .8rem;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all .18s;
+}
+
+.pkg-cat-btn:hover {
+  border-color: var(--border2);
+  color: var(--text);
+}
+
+.pkg-cat-btn.active {
+  background: rgba(37, 99, 235, .08);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* --- Shopee-Style Order Tabs --- */
+.order-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  background: var(--surface);
+  border-radius: 8px 8px 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.order-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.order-tab-btn {
+  flex: 1;
+  min-width: 100px;
+  padding: 1rem 0.5rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.order-tab-btn:hover {
+  color: var(--accent);
+}
+
+.order-tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+
+/* Order Empty State */
+.order-empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px dashed var(--border);
+}
+
+.order-empty-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.5rem;
+  color: var(--text3);
+  opacity: 0.5;
+}
+
+.order-empty-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 0.5rem;
+}
+
+.order-empty-sub {
+  font-size: 0.85rem;
+  color: var(--text3);
+  margin-bottom: 1.5rem;
+}
+
+@media(max-width: 700px) {
+  .order-tabs {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    border-radius: 0;
+  }
+
+  .order-tab-btn {
+    min-width: 90px;
+    padding: 0.85rem 0.4rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media(max-width:700px) {
+  .laptop-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pkg-customizer {
+    grid-template-columns: 1fr;
+  }
+
+  .services-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

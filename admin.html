@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin</title>
+  <meta name="description" content="Digispex Admin Panel — Manage inventory, orders, packages, and audit trail.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0a0f1c">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="apple-touch-icon" href="assets/logo.png">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="css/features.css">
+  <link rel="stylesheet" href="css/inventory.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <script src="javascript/theme.js"></script>
+  <script>
+    /* Admin guard */
+    (function () {
+      try {
+        const s = JSON.parse(localStorage.getItem('ds_auth_session'));
+        if (!s || s.role !== 'admin') window.location.replace('login.html');
+      } catch { window.location.replace('login.html'); }
+    })();
+  </script>
+</head>
+
+<body>
+
+  <nav>
+    <div class="nav-logo" onclick="location.href='index.html'">
+      <img src="assets/logo.png" class="nav-logo-img" alt="Digispex Logo"
+        onerror="this.style.display='none';this.nextElementSibling.nextElementSibling.style.display='inline-block'">
+      <span class="logo-text">Digispex</span>
+      <span class="logo-dot" style="display:none"></span>
+    </div>
+    <span class="nav-badge">Admin Panel</span>
+    <div class="nav-right">
+      <!-- Notifications -->
+      <div class="notif-bell-wrap" id="notifBellWrap">
+        <button class="notif-bell-btn" onclick="toggleNotifDropdown(event)" title="Notifications"
+          aria-label="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <span class="notif-badge" id="notifBadge" style="display:none">0</span>
+        </button>
+        <div class="notif-dropdown" id="notifDropdown">
+          <div class="notif-header">
+            <span class="notif-header-title">Notifications</span>
+            <div class="notif-header-actions">
+              <button class="notif-mark-all-btn" onclick="markAllNotifRead()">Mark all read</button>
+              <button class="notif-clear-btn" onclick="clearAllNotif()">Clear all</button>
+            </div>
+          </div>
+          <div class="notif-list" id="notifList"></div>
+        </div>
+      </div>
+      <button class="admin-theme-btn" id="adminThemeBtn" onclick="toggleAdminTheme()" title="Switch to Light Mode"><svg
+          width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4" />
+          <line x1="12" y1="2" x2="12" y2="4" />
+          <line x1="12" y1="20" x2="12" y2="22" />
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+          <line x1="2" y1="12" x2="4" y2="12" />
+          <line x1="20" y1="12" x2="22" y2="12" />
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        </svg></button>
+
+      <button class="btn-nav logout" onclick="handleLogout()">Log Out</button>
+    </div>
+  </nav>
+
+  <div class="admin-wrap">
+
+    <!-- Tabs -->
+    <div class="admin-tabs">
+      <button class="admin-tab active" data-tab="inventory" onclick="switchTab('inventory')">Inventory</button>
+      <button class="admin-tab" data-tab="addProduct" onclick="switchTab('addProduct')">+ Add Product</button>
+      <button class="admin-tab" data-tab="orders" onclick="switchTab('orders')">Orders</button>
+      <button class="admin-tab" data-tab="audit" onclick="switchTab('audit')">Audit Trail</button>
+      <button class="admin-tab" data-tab="packages" onclick="switchTab('packages')">Packages</button>
+    </div>
+
+    <!-- Inventory -->
+    <div id="panelInventory">
+      <!-- Restock alert -->
+      <div class="inv-restock-banner" id="invRestockBanner">
+        <svg class="inv-restock-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        <span><strong><span class="inv-restock-count">0</span> product(s)</strong> are currently out of stock and need
+          restocking.</span>
+      </div>
+      <div class="panel-title">Inventory Management</div>
+      <div class="panel-sub">Set product availability. Changes are visible to customers instantly.</div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Total Products</div>
+          <div class="stat-val blue" id="statTotal">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">In Stock</div>
+          <div class="stat-val green" id="statNormal">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">On Sale</div>
+          <div class="stat-val yellow" id="statSale">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Low Stock</div>
+          <div class="stat-val orange" id="statLow">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Out of Stock</div>
+          <div class="stat-val red" id="statOOS">—</div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <input class="search-bar" type="text" id="searchInput" placeholder="Search products by name or specs..."
+          oninput="renderTable()">
+        <select class="filter-sel" id="catFilter" onchange="renderTable()">
+          <option value="All">All Category</option>
+          <option value="CPU">CPU</option>
+          <option value="GPU">GPU</option>
+          <option value="Motherboard">Motherboard</option>
+          <option value="RAM">RAM</option>
+          <option value="Storage">Storage</option>
+          <option value="PSU">PSU</option>
+          <option value="Cooling">Cooling</option>
+          <option value="Case">Case</option>
+          <option value="Laptop">Laptop</option>
+        </select>
+        <select class="filter-sel" id="statusFilter" onchange="renderTable()">
+          <option value="All">All Status</option>
+          <option value="normal">In Stock</option>
+          <option value="sale">On Sale</option>
+          <option value="lowstock">Low Stock</option>
+          <option value="outofstock">Out of Stock</option>
+        </select>
+        <span class="selected-count" id="selCount">0 selected</span>
+        <button class="btn-bulk" onclick="restoreHiddenProducts()" id="restoreHiddenBtn"
+          style="display:none;background:rgba(239,68,68,0.08);color:#ef4444;border-color:rgba(239,68,68,0.3)">Restore
+          Hidden</button>
+      </div>
+
+      <div class="inv-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="th-check"><input type="checkbox" id="checkAll" onchange="toggleAll(this)"></th>
+              <th class="th-name">Product</th>
+              <th class="th-cat">Category</th>
+              <th class="th-price">Price (PHP)</th>
+              <th class="th-qty">Stock Qty</th>
+              <th class="th-status">Status</th>
+              <th class="th-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Add Product -->
+    <div id="panelAddProduct" style="display:none">
+      <div class="panel-title">Add New Product</div>
+      <div class="panel-sub">New products appear in the store immediately and are manageable from Inventory.</div>
+
+      <div class="add-product-grid">
+        <form id="addProductForm" onsubmit="submitAddProduct(event)">
+
+          <div class="form-card">
+            <div class="form-card-title">Product Details</div>
+            <div class="form-group">
+              <label class="form-label" for="apName">Product Name *</label>
+              <input class="form-input" id="apName" type="text" placeholder="e.g. ASUS ROG Strix RTX 4080" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="apCat">Category *</label>
+                <select class="form-select" id="apCat" required onchange="_toggleCompatFields(this.value)">
+                  <option value="">Select category</option>
+                  <option value="CPU">CPU</option>
+                  <option value="GPU">GPU</option>
+                  <option value="Motherboard">Motherboard</option>
+                  <option value="RAM">RAM</option>
+                  <option value="Storage">Storage</option>
+                  <option value="PSU">PSU</option>
+                  <option value="Cooling">Cooling</option>
+                  <option value="Case">Case</option>
+                  <option value="Laptop">Laptop</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="apPricePHP">Price (PHP) *</label>
+                <input class="form-input" id="apPricePHP" type="number" min="1" step="1" placeholder="e.g. 65000"
+                  required>
+              </div>
+            </div>
+
+            <!-- Compatibility Fields: Socket & RAM Type -->
+            <div class="form-row" id="apCompatGroup" style="display:none">
+              <div class="form-group" id="apSocketGroup" style="display:none">
+                <label class="form-label" for="apSocket">Socket</label>
+                <select class="form-select" id="apSocket">
+                  <option value="">No socket</option>
+                  <option value="AM4">AMD AM4</option>
+                  <option value="AM5">AMD AM5</option>
+                  <option value="LGA1700">Intel LGA1700</option>
+                  <option value="LGA1851">Intel LGA1851</option>
+                </select>
+              </div>
+              <div class="form-group" id="apMemGroup" style="display:none">
+                <label class="form-label" for="apMemType">Memory Type</label>
+                <select class="form-select" id="apMemType">
+                  <option value="">N/A</option>
+                  <option value="DDR4">DDR4</option>
+                  <option value="DDR5">DDR5</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Power Fields: Wattage/Draw -->
+            <div class="form-row" id="apPowerGroup" style="display:none">
+              <div class="form-group" style="flex:1">
+                <label class="form-label" for="apWattage" id="apWattageLabel">Power Draw (W)</label>
+                <input class="form-input" id="apWattage" type="number" min="0" step="1" placeholder="e.g. 125">
+              </div>
+            </div>
+
+            <!-- Physical Dimensions & Form Factors -->
+            <div class="form-row" id="apPhysicalGroup" style="display:none">
+              <div class="form-group" id="apGpuLengthGroup" style="display:none">
+                <label class="form-label" for="apGpuLength">GPU Length (mm)</label>
+                <input class="form-input" id="apGpuLength" type="number" min="0" step="1" placeholder="320">
+              </div>
+              <div class="form-group" id="apMaxGpuLengthGroup" style="display:none">
+                <label class="form-label" for="apMaxGpuLength">Max GPU Clearance (mm)</label>
+                <input class="form-input" id="apMaxGpuLength" type="number" min="0" step="1" placeholder="350">
+              </div>
+              <div class="form-group" id="apFormFactorGroup" style="display:none">
+                <label class="form-label" for="apFormFactor">Form Factor</label>
+                <select class="form-select" id="apFormFactor">
+                  <option value="">N/A</option>
+                  <option value="ATX">ATX</option>
+                  <option value="Micro-ATX">Micro-ATX</option>
+                  <option value="Mini-ITX">Mini-ITX</option>
+                  <option value="E-ATX">E-ATX</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" id="apSupportedFfGroup" style="display:none !important">
+              <label class="form-label" for="apSupportedFf">Supported Motherboard Form Factors</label>
+              <input class="form-input" id="apSupportedFf" type="text" placeholder="e.g. ATX, Micro-ATX, Mini-ITX">
+              <small style="color:var(--text3);font-size:0.7rem">Comma separated values</small>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="apSpecs">Specifications *</label>
+              <input class="form-input" id="apSpecs" type="text" placeholder="e.g. 16GB GDDR6X, 256-bit, 2505MHz"
+                required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="apDesc">Description</label>
+              <textarea class="form-textarea" id="apDesc" placeholder="Shown on the product detail page..."></textarea>
+            </div>
+            <!-- Professional Performance Metrics -->
+            <div class="form-group" id="apBenchGroup" style="display:none">
+              <label class="form-label" for="apBenchScore">
+                Benchmark Score
+                <span style="font-weight:400;color:var(--text3);font-size:.72rem;text-transform:none;letter-spacing:0">
+                  — 1 to 100 (Calculated via Tool)</span>
+              </label>
+              <div style="display:flex;align-items:center;gap:0.75rem">
+                <input id="apBenchScore" type="hidden" value="0">
+                <button type="button" class="btn-calc-bench" onclick="openBenchCalculator()"
+                  title="Calculate Score based on specs">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 7h.01" />
+                    <path d="M17 12h.01" />
+                    <path d="M7 12h.01" />
+                    <path d="M12 17h.01" />
+                    <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z" />
+                    <path d="M12 7v10" />
+                    <path d="M7 12h10" />
+                  </svg>
+                  Calculate
+                </button>
+                <div id="benchScoreDisplay"
+                  style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:var(--text3)">
+                  <div id="benchScoreBar"
+                    style="width:120px;height:8px;border-radius:4px;background:var(--border);overflow:hidden">
+                    <div id="benchScoreFill"
+                      style="height:100%;width:0%;border-radius:4px;background:var(--accent);transition:width 0.3s,background 0.3s">
+                    </div>
+                  </div>
+                  <span id="benchScoreLabel">Not set</span>
+                </div>
+              </div>
+              <div style="margin-top:0.4rem;font-size:0.72rem;color:var(--text3)">
+                Guide: Flagship = 90+ · High-end = 75–89 · Mid-range = 50–74 · Budget = 30–49 · Entry = 1–29
+              </div>
+            </div>
+            <!-- Image URL field — available for all categories -->
+            <div class="form-group" id="apImageUrlGroup">
+              <label class="form-label" for="apImageUrl">Image URL <span
+                  style="font-weight:400;color:var(--text3);font-size:.72rem">(paste a direct image link)</span></label>
+              <input class="form-input" id="apImageUrl" type="url" placeholder="https://example.com/laptop.jpg">
+              <div id="apImageUrlPreview"
+                style="display:none;margin-top:.5rem;border-radius:8px;overflow:hidden;max-height:120px">
+                <img id="apImageUrlImg" src="" alt="URL Preview"
+                  style="width:100%;height:120px;object-fit:cover;display:block">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-card" style="margin-top:1rem">
+            <div class="form-card-title">Inventory & Status</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="apStatus">Stock Status</label>
+                <select class="form-select" id="apStatus" onchange="_handleStatusChange(this.value)">
+                  <option value="normal">In Stock</option>
+                  <option value="sale">On Sale</option>
+                  <option value="lowstock">Low Stock</option>
+                  <option value="outofstock">Out of Stock</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="apQty">Stock Quantity</label>
+                <input class="form-input" id="apQty" type="number" min="0" step="1" placeholder="e.g. 50">
+              </div>
+              <div class="form-group" id="apSaleFields" style="display:none">
+                <label class="form-label" for="apDiscount">Discount (%)</label>
+                <input class="form-input" id="apDiscount" type="number" min="1" max="99" value="15">
+              </div>
+            </div>
+            <div class="form-row" id="apSaleDates" style="display:none">
+              <div class="form-group">
+                <label class="form-label" for="apSaleStart">Start Date (Optional)</label>
+                <input class="form-input" id="apSaleStart" type="date">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="apSaleEnd">End Date (Optional)</label>
+                <input class="form-input" id="apSaleEnd" type="date">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-card" style="margin-top:1rem">
+            <div class="form-card-title">Product Image <span
+                style="font-weight:400;color:var(--text3);font-size:.72rem">— upload file or paste URL above</span>
+            </div>
+            <div class="img-upload-zone" id="imgUploadZone">
+              <div class="upload-icon">&#128444;</div>
+              <div class="upload-label">Click or drag image here</div>
+              <div class="upload-hint">JPG, PNG, WebP — max 4 MB</div>
+            </div>
+            <input type="file" id="imgFileInput" accept="image/*" style="display:none">
+          </div>
+
+          <div style="display:flex;gap:0.75rem;margin-top:1rem">
+            <button type="submit" class="btn-add-product" style="flex:1">Add Product to Store</button>
+            <button type="button" id="apCancelEdit" class="btn-secondary" style="display:none;padding:0 1.5rem"
+              onclick="cancelEdit()">Cancel Edit</button>
+          </div>
+        </form>
+
+        <div>
+          <div class="preview-card">
+            <div class="preview-header">Live Preview</div>
+            <div class="preview-img-area" id="previewImg">PRODUCT</div>
+            <div class="preview-body">
+              <div class="preview-cat" id="previewCat">Category</div>
+              <div class="preview-name" id="previewName">Product Name</div>
+              <div class="preview-specs" id="previewSpecs">Specifications will appear here</div>
+              <div class="preview-price" id="previewPrice">&#8369;0</div>
+            </div>
+          </div>
+
+          <div class="form-card" style="margin-top:1rem">
+            <div class="form-card-title">Recently Added</div>
+            <div class="recent-list" id="recentList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders -->
+    <div id="panelOrders" style="display:none">
+      <div class="panel-title">Order Management</div>
+      <div class="panel-sub">Update status or remove any order. Changes take effect immediately.</div>
+
+      <div class="orders-summary-row">
+        <div class="stat-card">
+          <div class="stat-label">Total Orders</div>
+          <div class="stat-val blue" id="orderStatTotal">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Processing</div>
+          <div class="stat-val yellow" id="orderStatProc">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Shipped</div>
+          <div class="stat-val blue" id="orderStatShipped">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Delivered</div>
+          <div class="stat-val green" id="orderStatDelivered">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Received</div>
+          <div class="stat-val purple" id="orderStatReceived" style="color:var(--accent3)">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Cancelled</div>
+          <div class="stat-val red" id="orderStatCancelled">—</div>
+        </div>
+      </div>
+
+      <div class="order-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="th-oid">Order ID</th>
+              <th class="th-ocust">Customer</th>
+              <th class="th-oitems">Items</th>
+              <th class="th-ototal">Total</th>
+              <th class="th-opayment">Payment</th>
+              <th class="th-ostatus">Status</th>
+              <th class="th-oactions">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Audit Trail -->
+    <div id="panelAudit" style="display:none">
+      <div class="panel-title">Audit Trail</div>
+      <div class="panel-sub">Automatic log of all status changes, orders placed, and products added.</div>
+
+      <div class="audit-filters">
+        <select class="filter-sel" id="auditTypeFilter" onchange="renderAudit()">
+          <option value="all">All Events</option>
+          <option value="status_change">Inventory Changes</option>
+          <option value="order_placed">Orders Placed</option>
+          <option value="order_status_change">Order Status Updates</option>
+          <option value="order_deleted">Orders Deleted</option>
+          <option value="product_added">Product Changes</option>
+        </select>
+        <button class="btn-clear-audit" onclick="clearAuditLog()">Clear Log</button>
+      </div>
+
+      <div class="audit-list" id="auditList"></div>
+    </div>
+
+
+    <!-- Packages -->
+    <div id="panelPackages" style="display:none">
+      <div class="panel-title">Package Manager</div>
+      <div class="panel-sub">Edit existing packages or create new ones. All changes appear on the store immediately.
+      </div>
+
+      <div style="display:flex;gap:.75rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center">
+        <button class="btn-bulk btn-bulk-sale" onclick="adminOpenNewPkg()"
+          style="background:var(--badge-bg);color:var(--accent);border-color:var(--badge-border)">+ New Package</button>
+        <button class="btn-bulk btn-bulk-reset" onclick="adminResetPackages()" style="font-size:.75rem">Reset to
+          Defaults</button>
+      </div>
+
+      <div id="pkgAdminGrid"></div>
+    </div>
+
+  </div>
+
+  <!-- Package edit modal -->
+  <div class="modal-overlay" id="pkgEditModal" onclick="if(event.target===this)closePkgEditModal()">
+    <div class="modal modal-sm" style="max-width:680px;width:95%">
+      <div class="modal-header">
+        <h2 id="pkgEditModalTitle">Edit Package</h2>
+        <button class="modal-close" onclick="closePkgEditModal()">&#10005;</button>
+      </div>
+      <div class="modal-body" style="display:grid;gap:1rem">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+          <div class="form-group">
+            <label class="form-label">Package Name *</label>
+            <input class="form-input" id="peditName" type="text" placeholder="e.g. Gaming Pro">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category *</label>
+            <select class="form-select" id="peditCat">
+              <option value="Gaming">Gaming</option>
+              <option value="Creator">Creator</option>
+              <option value="Office">Office</option>
+              <option value="School">School</option>
+              <option value="Workstation">Workstation</option>
+              <option value="Streaming">Streaming</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tagline *</label>
+          <input class="form-input" id="peditTagline" type="text"
+            placeholder="e.g. 1440p powerhouse — competitive and AAA">
+        </div>
+
+        <div style="display:flex;align-items:center;gap:.75rem">
+          <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.82rem;color:var(--text2)">
+            <input type="checkbox" id="peditFeatured" style="accent-color:var(--accent)">
+            Mark as Popular / Featured
+          </label>
+        </div>
+
+        <div>
+          <div class="form-label" style="margin-bottom:.5rem">Components</div>
+          <div id="peditSlots" style="display:flex;flex-direction:column;gap:.4rem"></div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:.6rem;margin-top:.5rem">
+          <button class="btn-action btn-normal" onclick="savePkgEdit()">Save Package</button>
+          <button class="btn-action" onclick="closePkgEditModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /admin-wrap -->
+  <!-- Admin Chat -->
+  <div class="modal-overlay" id="adminChatModal">
+    <div class="modal modal-admin-chat">
+
+      <!-- Chat header -->
+      <div class="modal-header admin-chat-header">
+        <div style="display:flex;align-items:center;gap:0.7rem;min-width:0">
+          <div class="admin-chat-avatar-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+          </div>
+          <div style="min-width:0">
+            <div style="font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;font-size:1.1rem;line-height:1">
+              Customer Support</div>
+            <div id="adminChatTitle"
+              style="font-size:0.67rem;color:var(--text3);font-family:'JetBrains Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+            </div>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeAdminChat()">&#10005;</button>
+      </div>
+
+      <!-- Chat body -->
+      <div class="modal-body admin-chat-body">
+
+        <!-- LEFT — Order Context Panel -->
+        <aside class="admin-chat-sidebar" id="adminChatSidebar">
+
+          <div class="acs-section-label">Order Details</div>
+
+          <!-- Order + customer meta -->
+          <div class="acs-meta" id="adminChatMeta">
+            <!-- filled by JS -->
+          </div>
+
+          <!-- Items purchased -->
+          <div class="acs-section-label" style="margin-top:1rem">Items Purchased</div>
+          <div class="acs-items" id="adminChatItems">
+            <!-- filled by JS -->
+          </div>
+
+          <!-- Quick-reply chips -->
+          <div class="acs-section-label" style="margin-top:1rem">Quick Replies</div>
+          <div class="acs-chips" id="adminChatChips">
+            <!-- filled by JS -->
+          </div>
+
+        </aside>
+
+        <!-- RIGHT — Chat panel -->
+        <div class="admin-chat-main">
+          <div class="chat-order-bar">
+            <span class="chat-order-tag" id="adminChatTag"></span>
+            <span class="chat-order-label">Support Thread</span>
+          </div>
+          <div class="chat-messages" id="adminChatMessages"></div>
+          <div class="chat-input-bar">
+            <textarea id="adminChatInput" placeholder="Type your reply..." rows="1" onkeydown="adminChatKeydown(event)"
+              oninput="chatInputAutoResize(this)" autocomplete="off"></textarea>
+            <button class="chat-send-btn" onclick="sendAdminReply()" title="Send reply">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /.admin-chat-body -->
+    </div>
+  </div>
+
+
+
+
+
+  <!-- Benchmark Calculator Modal -->
+  <div class="modal-overlay" id="benchCalcModal" onclick="if(event.target===this)closeBenchCalculator()">
+    <div class="modal modal-sm" style="max-width:500px;width:95%">
+      <div class="modal-header">
+        <h2 id="benchCalcTitle">Performance Calculator</h2>
+        <button class="modal-close" onclick="closeBenchCalculator()">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <div id="benchCalcFields" style="display:grid;gap:1.25rem">
+          <!-- Dynamically populated based on category -->
+        </div>
+
+        <div class="bench-calc-result" id="benchCalcResultArea"
+          style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);display:none;text-align:center">
+          <div
+            style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:0.5rem">
+            Estimated Performance</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:1rem">
+            <div id="bcScoreVal" style="font-size:3.5rem;font-weight:800;line-height:1;color:var(--accent)">0</div>
+            <div style="text-align:left">
+              <div id="bcTierLabel" style="font-weight:700;font-size:1.1rem;color:var(--text)">Not Calculated</div>
+              <div id="bcTargetLabel" style="font-size:0.8rem;color:var(--text3)">Enter specs to begin</div>
+            </div>
+          </div>
+          <div style="margin-top:1.5rem;display:flex;gap:0.75rem">
+            <button class="btn-action btn-normal" style="flex:1" onclick="applyBenchScore()">Apply to Product</button>
+            <button class="btn-action" style="flex:1" onclick="closeBenchCalculator()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="javascript/supabase-client.js"></script>
+  <script src="javascript/supabase-sync.js"></script>
+  <script src="javascript/catalog.js"></script>
+  <script src="javascript/database.js"></script>
+  <script src="javascript/images.js"></script>
+  <script src="javascript/packages.js"></script>
+  <script src="javascript/auth-modal.js"></script>
+  <script src="javascript/notifications.js"></script>
+  <script src="javascript/messaging.js"></script>
+  <!-- Inventory scripts -->
+  <script src="javascript/inventory.js"></script>
+  <script src="javascript/admin.js"></script>
+  <!-- Theme is managed globally by theme.js (loaded in <head>) -->
+</body>
+
+</html>

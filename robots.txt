@@ -1,0 +1,7 @@
+# Digispex Online Shop - robots.txt
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /owner.html
+
+Sitemap: sitemap.xml

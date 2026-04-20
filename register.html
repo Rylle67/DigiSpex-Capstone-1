@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account</title>
+  <meta name="description"
+    content="Create your Digispex account to start building custom PCs, browsing components, and ordering premium hardware.">
+  <meta name="theme-color" content="#0a0f1c">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="apple-touch-icon" href="assets/logo.png">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+
+
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      background: var(--bg);
+    }
+
+    /* Accent strip */
+    .auth-page::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #1d4ed8, #2563eb, #3b82f6);
+      z-index: 10;
+    }
+
+    .auth-page-logo {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 2.2rem;
+      letter-spacing: -1px;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .auth-page-tagline {
+      font-size: 0.78rem;
+      color: var(--text3);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .auth-page-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem 2.25rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 4px 24px rgba(37, 99, 235, 0.10);
+    }
+
+    .auth-page-title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+
+    .auth-page-sub {
+      font-size: 0.82rem;
+      color: var(--text3);
+      margin-bottom: 1.75rem;
+    }
+
+    .auth-page-footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.82rem;
+      color: var(--text3);
+    }
+
+    .auth-page-footer a {
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .auth-page-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .auth-back-link {
+      margin-top: 1.25rem;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text3);
+    }
+
+    .auth-back-link a {
+      color: var(--text3);
+      text-decoration: none;
+    }
+
+    .auth-back-link a:hover {
+      color: var(--accent);
+    }
+
+    /* Strength bar */
+    .auth-password-strength {
+      margin-top: 6px;
+    }
+
+    .strength-track {
+      height: 4px;
+      border-radius: 4px;
+      background: var(--border);
+      overflow: hidden;
+      margin-bottom: 3px;
+    }
+
+    .strength-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s, background 0.3s;
+      width: 0%;
+    }
+
+    .strength-label {
+      font-size: 0.72rem;
+      color: var(--text3);
+    }
+
+    /* OTP */
+    #verifyScreen {
+      display: none;
+    }
+
+    .verify-icon {
+      font-size: 2.5rem;
+      text-align: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .verify-sent-to {
+      font-size: 0.82rem;
+      color: var(--text3);
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .verify-sent-to strong {
+      color: var(--text);
+    }
+
+    .otp-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .otp-input {
+      width: 48px;
+      height: 56px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: var(--s2, #f0f4ff);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .otp-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .otp-input.otp-filled {
+      border-color: var(--accent);
+    }
+
+    .verify-countdown {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text3);
+      margin-bottom: 1rem;
+      min-height: 1.2em;
+    }
+
+    .verify-resend-btn {
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+    }
+
+    .verify-resend-btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+      text-decoration: none;
+    }
+
+    .verify-sending {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.5rem 0;
+      color: var(--text2);
+      font-size: 0.88rem;
+    }
+
+    .spinner-ring {
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <script src="javascript/theme.js"></script>
+
+  <div class="auth-page">
+
+    <a class="auth-page-logo" href="index.html">
+      <img src="assets/logo.png" class="nav-logo-img" style="width:40px;height:40px" alt="Digispex Logo"
+        onerror="this.style.display='none';this.nextElementSibling.nextElementSibling.style.display='inline-block'">
+      <span class="logo-text">Digispex</span>
+      <span class="logo-dot" style="display:none"></span>
+    </a>
+    <div class="auth-page-tagline">Online Shop with Package Customization</div>
+
+    <div class="auth-page-card">
+
+      <!-- Registration form -->
+      <div id="registerScreen">
+        <div class="auth-page-title">Create Account</div>
+        <div class="auth-page-sub">Join Digispex and start building your dream PC</div>
+
+        <form id="registerForm" onsubmit="handleRegister(event)" novalidate>
+
+          <div class="auth-form-group">
+            <label class="auth-label">Full Name</label>
+            <input class="form-input" id="regName" type="text" placeholder="Juan dela Cruz" autocomplete="name">
+            <span class="auth-error" id="reg-err-name"></span>
+          </div>
+
+          <div class="auth-form-group">
+            <label class="auth-label">Email Address</label>
+            <input class="form-input" id="regEmail" type="email" placeholder="you@example.com" autocomplete="email">
+            <span class="auth-error" id="reg-err-email"></span>
+          </div>
+
+
+          <div class="auth-form-group">
+            <label class="auth-label">
+              Password <span class="auth-hint">(min. 6 characters)</span>
+            </label>
+            <div class="auth-input-wrap">
+              <input class="form-input" id="regPassword" type="password" placeholder="Create a password"
+                autocomplete="new-password">
+              <button type="button" class="auth-eye-btn" onclick="togglePasswordVis('regPassword', this)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                  <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+                  <path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+                  <line x1="2" x2="22" y1="2" y2="22" />
+                </svg>
+              </button>
+            </div>
+            <div class="auth-password-strength" id="strengthBar" style="display:none">
+              <div class="strength-track">
+                <div class="strength-fill" id="strengthFill"></div>
+              </div>
+              <span class="strength-label" id="strengthLabel"></span>
+            </div>
+            <span class="auth-error" id="reg-err-password"></span>
+          </div>
+
+          <div class="auth-form-group">
+            <label class="auth-label">Confirm Password</label>
+            <div class="auth-input-wrap">
+              <input class="form-input" id="regConfirm" type="password" placeholder="Repeat your password"
+                autocomplete="new-password">
+              <button type="button" class="auth-eye-btn" onclick="togglePasswordVis('regConfirm', this)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                  <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+                  <path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+                  <line x1="2" x2="22" y1="2" y2="22" />
+                </svg>
+              </button>
+            </div>
+            <span class="auth-error" id="reg-err-confirm"></span>
+          </div>
+
+          <button type="submit" class="btn-primary auth-submit-btn" id="registerSubmitBtn">
+            Create Account
+          </button>
+        </form>
+
+        <div class="auth-page-footer">
+          Already have an account?
+          <a href="login.html">Sign in</a>
+        </div>
+        <div class="auth-back-link">
+          <a href="index.html">&larr; Back to store</a>
+        </div>
+      </div>
+
+      <!-- OTP verification -->
+      <div id="otpScreen" style="display:none;">
+        <div class="auth-page-title">Verify Email</div>
+        <div class="auth-page-sub">Enter the 8-digit code sent to <span id="displayOtpEmail"
+            style="font-weight:bold;color:var(--text-1);"></span></div>
+
+        <div class="auth-form-group" style="margin-top:20px;">
+          <label class="auth-label" style="text-align:center;">8-Digit OTP</label>
+          <div class="otp-row" style="display:flex; gap:0.5rem; justify-content:center; margin: 1.5rem 0;">
+            <input type="text" maxlength="1" class="otp-input reg-otp" data-index="0"
+              style="width:40px; height:50px; text-align:center; font-size:1.35rem; font-family:'JetBrains Mono',monospace; font-weight:700; border:2px solid var(--border); border-radius:10px; background:var(--s2, #f0f4ff); color:var(--text); outline:none;">
+            <input type="text" maxlength="1" class="otp-input reg-otp" data-index="1"
+              style="width:40px; height:50px; text-align:center; font-size:1.35rem; font-family:'JetBrains Mono',monospace; font-weight:700; border:2px solid var(--border); border-radius:10px; background:var(--s2, #f0f4ff); color:var(--text); outline:none;">
+            <input type="text" maxlength="1" class="otp-input reg-otp" data-index="2"
+              style="width:40px; height:50px; text-align:center; font-size:1.35rem; font-family:'JetBrains Mono',monospace; font-weight:700; border:2px solid var(--border); border-radius:10px; background:var(--s2, #f0f4ff); color:var(--text); outline:none;">
+            <input type="text" maxlength="1" class="otp-input reg-otp" data-index="3"
+              style="width:40px; height:50px; text-align:center; font-size:1.35rem; font-family:'JetBrains Mono',monospace; font-weight:700; border:2px solid var(--border); border-radius:10px; background:var(--s2, #f0f4ff); color:var(--text); outline:none;">
+            <input type="text" maxlength="1" class="otp-input reg-otp" data-index="4"
+              style="width:40px; height:50px; text-align:center; font-size:1.35rem; font-family:'JetBrains Mono',monospace; font-weight:700; border:2px solid var(--border); border-radius:10px; background:var(--s2, #f0f4ff); color:var(--text); outline:none;">
+            <input type="text" maxlength="1" class="otp-input reg-otp" data-index="5"
+              style="width:40px; height:50px; text-align:center; font-size:1.35rem; font-family:'JetBrains Mono',monospace; font-weight:700; border:2px solid var(--border); border-radius:10px; background:var(--s2, #f0f4ff); color:var(--text); outline:none;">
+            <input type="text" maxlength="1" class="otp-input reg-otp" data-index="6"
+              style="width:40px; height:50px; text-align:center; font-size:1.35rem; font-family:'JetBrains Mono',monospace; font-weight:700; border:2px solid var(--border); border-radius:10px; background:var(--s2, #f0f4ff); color:var(--text); outline:none;">
+            <input type="text" maxlength="1" class="otp-input reg-otp" data-index="7"
+              style="width:40px; height:50px; text-align:center; font-size:1.35rem; font-family:'JetBrains Mono',monospace; font-weight:700; border:2px solid var(--border); border-radius:10px; background:var(--s2, #f0f4ff); color:var(--text); outline:none;">
+          </div>
+          <span class="auth-error" id="reg-err-otp" style="text-align:center;"></span>
+        </div>
+
+        <button type="button" class="btn-primary auth-submit-btn" id="verifyOtpBtn" onclick="verifyOTP()">
+          Verify & Create Account
+        </button>
+
+        <div class="auth-back-link" style="margin-top:15px; text-align:center;">
+          <a href="#" onclick="cancelOTP()">&larr; Change Email</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <style>
+    /* Strength bar */
+    .auth-password-strength {
+      margin-top: 6px;
+    }
+
+    .strength-track {
+      height: 4px;
+      border-radius: 4px;
+      background: var(--border2);
+      overflow: hidden;
+      margin-bottom: 3px;
+    }
+
+    .strength-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s, background 0.3s;
+      width: 0%;
+    }
+
+    .strength-label {
+      font-size: 0.72rem;
+      color: var(--text3);
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="javascript/supabase-client.js"></script>
+  <script src="javascript/supabase-sync.js"></script>
+  <script src="javascript/auth-modal.js"></script>
+
+  <script>
+    /* Toast */
+    function showToast(msg, type) {
+      const el = document.getElementById('toast');
+      if (!el) return;
+      el.textContent = msg;
+      el.className = 'toast ' + (type || 'success') + ' show';
+      setTimeout(() => el.classList.remove('show'), 2800);
+    }
+
+    /* Strength meter */
+    document.getElementById('regPassword').addEventListener('input', function () {
+      const val = this.value;
+      const bar = document.getElementById('strengthBar');
+      const fill = document.getElementById('strengthFill');
+      const lbl = document.getElementById('strengthLabel');
+      if (!val) { bar.style.display = 'none'; return; }
+      bar.style.display = 'block';
+
+      let score = 0;
+      if (val.length >= 6) score++;
+      if (val.length >= 10) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      const levels = [
+        { w: '20%', color: '#ef4444', text: 'Very weak' },
+        { w: '40%', color: '#f97316', text: 'Weak' },
+        { w: '60%', color: '#eab308', text: 'Fair' },
+        { w: '80%', color: '#22c55e', text: 'Strong' },
+        { w: '100%', color: '#10b981', text: 'Very strong' },
+      ];
+      const lvl = levels[Math.min(score, 4)];
+      fill.style.width = lvl.w;
+      fill.style.background = lvl.color;
+      lbl.textContent = lvl.text;
+      lbl.style.color = lvl.color;
+    });
+  </script>
+
+</body>
+
+</html>

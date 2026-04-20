@@ -1,0 +1,433 @@
+/* ============================================================
+   Digispex — inventory.css
+   7. Light theme overrides
+============================================================ */
+
+
+/* ────────────────────────────────────────────────────────────
+   1. STOCK QUANTITY PILL — product cards
+──────────────────────────────────────────────────────────── */
+
+/* Wrapper sits above the product footer, below specs */
+.inv-card-qty-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.2rem 0 0.35rem;
+}
+
+/* The pill itself */
+.inv-card-qty {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* States */
+.inv-card-qty-ok {
+  background: rgba(34, 197, 94, 0.08);
+  color: #00c87a;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.inv-card-qty-low {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.inv-card-qty-oos {
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Pulse flash when qty just changed */
+.inv-card-qty.inv-flash {
+  animation: invCardFlash 0.6s ease;
+}
+
+@keyframes invCardFlash {
+  0%   { transform: scale(1);    filter: brightness(1); }
+  40%  { transform: scale(1.18); filter: brightness(1.6); }
+  100% { transform: scale(1);    filter: brightness(1); }
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   2. STOCK METER — product detail modal
+──────────────────────────────────────────────────────────── */
+
+.inv-meter-wrap {
+  margin: 0.65rem 0 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.inv-meter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.inv-meter-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+
+.inv-meter-qty {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text2);
+  transition: color 0.3s;
+}
+
+.inv-meter-qty.qty-ok  { color: #00c87a; }
+.inv-meter-qty.qty-low { color: #f59e0b; }
+.inv-meter-qty.qty-oos { color: #ef4444; }
+
+/* The track */
+.inv-meter-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface2);
+  overflow: hidden;
+  position: relative;
+}
+
+/* The fill */
+.inv-meter-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease, background 0.4s;
+  min-width: 4px;
+}
+
+.inv-meter-fill-ok  { background: linear-gradient(90deg, #00c87a, #22c55e); }
+.inv-meter-fill-low { background: linear-gradient(90deg, #d97706, #f59e0b); }
+.inv-meter-fill-oos { background: #ef4444; }
+
+/* Stock status pill inside product modal */
+.inv-modal-pill {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 0.8rem;
+  transition: background 0.3s, color 0.3s;
+}
+
+.inv-pill-ok  { color: #22c55e; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25); }
+.inv-pill-low { color: #f59e0b; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.28); }
+.inv-pill-oos { color: #ef4444; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); }
+.inv-pill-sale{ color: #eab308; background: rgba(234,179,8,0.1);  border: 1px solid rgba(234,179,8,0.3); }
+
+
+/* ────────────────────────────────────────────────────────────
+   3. CART VALIDATION ALERT
+──────────────────────────────────────────────────────────── */
+
+.inv-cart-alert {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  display: none; /* shown by JS when problems exist */
+}
+
+.inv-cart-alert.visible { display: block; }
+
+.inv-cart-alert-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #ef4444;
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.inv-cart-alert-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.inv-cart-alert-item {
+  font-size: 0.8rem;
+  color: var(--text2);
+  padding-left: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.inv-cart-alert-item::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #ef4444;
+  flex-shrink: 0;
+}
+
+/* Qty + button disabled state in cart when OOS */
+.cart-item.cart-item-oos .qty-btn {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.cart-item-oos-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #ef4444;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 1px 6px;
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 4px;
+  margin-left: 0.4rem;
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   4. ADMIN QTY COLUMN & INLINE EDITOR
+──────────────────────────────────────────────────────────── */
+
+/* Qty cell in inventory table */
+.inv-qty-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+/* The numeric qty badge */
+.inv-qty-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  min-width: 28px;
+  text-align: center;
+  padding: 2px 6px;
+  border-radius: 5px;
+  transition: background 0.25s, color 0.25s;
+}
+
+.inv-qty-badge.qty-ok  { background: rgba(34,197,94,0.08);  color: #00c87a; }
+.inv-qty-badge.qty-low { background: rgba(245,158,11,0.1);  color: #f59e0b; }
+.inv-qty-badge.qty-oos { background: rgba(239,68,68,0.08);  color: #ef4444; }
+
+/* Edit button next to qty */
+.inv-qty-edit-btn {
+  background: none;
+  border: 1px solid var(--border2);
+  color: var(--text3);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.3px;
+}
+
+.inv-qty-edit-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Inline qty editor (small input + save/cancel) */
+.inv-qty-editor {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.inv-qty-input {
+  width: 56px;
+  padding: 3px 6px;
+  border: 1px solid var(--accent);
+  border-radius: 5px;
+  background: var(--surface2);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+}
+
+.inv-qty-input:focus {
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.inv-qty-save-btn,
+.inv-qty-cancel-btn {
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  transition: opacity 0.15s;
+}
+
+.inv-qty-save-btn   { background: var(--accent); color: #fff; }
+.inv-qty-cancel-btn { background: var(--surface2); color: var(--text3); border: 1px solid var(--border2); }
+
+.inv-qty-save-btn:hover   { opacity: 0.85; }
+.inv-qty-cancel-btn:hover { opacity: 0.75; }
+
+/* Restock notification bar at top of admin inventory panel */
+.inv-restock-banner {
+  background: rgba(239, 68, 68, 0.07);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 10px;
+  padding: 0.65rem 1rem;
+  margin-bottom: 1rem;
+  display: none;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.82rem;
+  color: var(--text2);
+}
+
+.inv-restock-banner.visible { display: flex; }
+
+.inv-restock-icon {
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+.inv-restock-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  color: #ef4444;
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   5. STOCK PULSE — live update feedback dot
+──────────────────────────────────────────────────────────── */
+
+.inv-live-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #00c87a;
+  margin-left: 0.4rem;
+  vertical-align: middle;
+  transition: background 0.3s;
+}
+
+.inv-live-dot.pulse {
+  animation: invPulse 0.8s ease;
+}
+
+.inv-live-dot.dot-low { background: #f59e0b; }
+.inv-live-dot.dot-oos { background: #ef4444; }
+
+@keyframes invPulse {
+  0%   { box-shadow: 0 0 0 0   rgba(0, 200, 122, 0.6); }
+  60%  { box-shadow: 0 0 0 8px rgba(0, 200, 122, 0); }
+  100% { box-shadow: 0 0 0 0   rgba(0, 200, 122, 0); }
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   6. PRODUCT CARD LOW-STOCK / OOS OVERLAYS (enhancements)
+──────────────────────────────────────────────────────────── */
+
+/* Subtle shimmer on sold-out cards */
+.card-oos {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-oos::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 8px,
+    rgba(0,0,0,0.06) 8px,
+    rgba(0,0,0,0.06) 9px
+  );
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+}
+
+/* "Qty changed" flash on product card */
+.product-card.inv-card-updated {
+  animation: cardUpdated 0.7s ease;
+}
+
+@keyframes cardUpdated {
+  0%   { box-shadow: 0 0 0 0   rgba(37, 99, 235, 0); }
+  35%  { box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.35); }
+  100% { box-shadow: 0 0 0 0   rgba(37, 99, 235, 0); }
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   7. LIGHT THEME
+──────────────────────────────────────────────────────────── */
+
+[data-theme="light"] .inv-cart-alert {
+  background: rgba(239, 68, 68, 0.05);
+}
+
+[data-theme="light"] .inv-qty-badge.qty-ok  { background: rgba(0, 170, 90, 0.08);  }
+[data-theme="light"] .inv-qty-badge.qty-low { background: rgba(217, 119, 6, 0.08); }
+[data-theme="light"] .inv-qty-badge.qty-oos { background: rgba(220, 38, 38, 0.07); }
+
+[data-theme="light"] .inv-meter-track { background: #e5e9f0; }
+
+[data-theme="light"] .inv-restock-banner {
+  background: rgba(220, 38, 38, 0.04);
+}
+
+[data-theme="light"] .inv-card-qty-ok  { background: rgba(0, 150, 80, 0.07); color: #059652; }
+[data-theme="light"] .inv-card-qty-low { background: rgba(180, 100, 0, 0.07); color: #c07000; }
+[data-theme="light"] .inv-card-qty-oos { background: rgba(200, 30, 30, 0.06); color: #dc2626; }
+
+
+/* ────────────────────────────────────────────────────────────
+   RESPONSIVE
+──────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .inv-qty-cell { flex-wrap: wrap; gap: 0.3rem; }
+  .inv-meter-fill { transition: width 0.3s ease; }
+}

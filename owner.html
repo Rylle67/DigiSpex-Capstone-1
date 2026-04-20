@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Owner</title>
+  <meta name="description"
+    content="Digispex Owner Dashboard — View sales analytics, revenue charts, and order reports.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0a0f1c">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="apple-touch-icon" href="assets/logo.png">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="css/features.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <script src="javascript/theme.js"></script>
+  <script>
+    /* Owner guard */
+    (function () {
+      try {
+        const s = JSON.parse(localStorage.getItem('ds_auth_session'));
+        if (!s || s.role !== 'owner') window.location.replace('login.html');
+      } catch { window.location.replace('login.html'); }
+    })();
+  </script>
+  <!-- Owner Dashboard styles are in admin.css -->
+</head>
+
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-logo" onclick="location.href='index.html'">
+      <img src="assets/logo.png" class="nav-logo-img" alt="Digispex Logo"
+        onerror="this.style.display='none';this.nextElementSibling.nextElementSibling.style.display='inline-block'">
+      <span class="logo-text">Digispex</span>
+      <span class="logo-dot" style="display:none"></span>
+    </div>
+    <span class="nav-badge">Owner Dashboard</span>
+    <div class="nav-right">
+      <!-- Notifications -->
+      <div class="notif-bell-wrap" id="notifBellWrap">
+        <button class="notif-bell-btn" onclick="toggleNotifDropdown(event)" title="Notifications"
+          aria-label="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <span class="notif-badge" id="notifBadge" style="display:none">0</span>
+        </button>
+        <div class="notif-dropdown" id="notifDropdown">
+          <div class="notif-header">
+            <span class="notif-header-title">Notifications</span>
+            <div class="notif-header-actions">
+              <button class="notif-mark-all-btn" onclick="markAllNotifRead()">Mark all read</button>
+              <button class="notif-clear-btn" onclick="clearAllNotif()">Clear all</button>
+            </div>
+          </div>
+          <div class="notif-list" id="notifList"></div>
+        </div>
+      </div>
+      <button class="admin-theme-btn" id="adminThemeBtn" onclick="toggleAdminTheme()" title="Switch to Light Mode"><svg
+          width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4" />
+          <line x1="12" y1="2" x2="12" y2="4" />
+          <line x1="12" y1="20" x2="12" y2="22" />
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+          <line x1="2" y1="12" x2="4" y2="12" />
+          <line x1="20" y1="12" x2="22" y2="12" />
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        </svg></button>
+
+      <button class="btn-nav logout" onclick="handleLogout()">Log Out</button>
+    </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="owner-hero">
+    <div class="owner-hero-inner">
+      <div>
+        <div class="owner-title">Sales <span>Overview</span></div>
+        <div class="owner-sub" id="ownerSub">Loading…</div>
+      </div>
+      <div class="range-pills">
+        <button class="range-pill active" onclick="setRange(7,this)">7 days</button>
+        <button class="range-pill" onclick="setRange(30,this)">30 days</button>
+        <button class="range-pill" onclick="setRange(90,this)">90 days</button>
+        <button class="range-pill" onclick="setRange(0,this)">All time</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard body -->
+  <div class="owner-wrap">
+
+    <!-- KPIs -->
+    <div class="kpi-row" id="kpiRow"></div>
+
+    <!-- Status breakdown -->
+    <div class="sec-hdr">Order Status Breakdown</div>
+    <div class="status-row" id="statusRow"></div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+      <div class="chart-box">
+        <div class="chart-box-title">Daily Revenue (₱)</div>
+        <canvas id="chartRevenue" height="170"></canvas>
+      </div>
+      <div class="chart-box">
+        <div class="chart-box-title">Orders by Status</div>
+        <canvas id="chartStatus" height="170"></canvas>
+      </div>
+    </div>
+
+    <!-- Top products -->
+    <div class="sec-hdr">Top Products by Revenue</div>
+    <div class="top-tbl-wrap">
+      <table class="top-tbl">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Product</th>
+            <th>Units Sold</th>
+            <th>Revenue (₱)</th>
+          </tr>
+        </thead>
+        <tbody id="topTbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Recent orders -->
+    <div class="sec-hdr">All Orders</div>
+    <div class="orders-wrap">
+      <div class="orders-toolbar">
+        <span style="font-size:.78rem;color:var(--text3)" id="ordersCount">—</span>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap">
+          <select class="orders-search" id="ordersSort" onchange="filterOrders()">
+            <option value="dateDesc">Date: Newest</option>
+            <option value="dateAsc">Date: Oldest</option>
+            <option value="statusPending">Status: Pending First</option>
+            <option value="totalDesc">Total: Highest</option>
+            <option value="totalAsc">Total: Lowest</option>
+          </select>
+          <input class="orders-search" type="text" id="ordersSearch" placeholder="Search order / customer…"
+            oninput="filterOrders()">
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="orders-tbl">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Items</th>
+              <th>Total (₱)</th>
+              <th>Pymt Status</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /owner-wrap -->
+
+  <!-- Order Details Modal -->
+  <div class="modal-overlay" id="orderDetailModal" onclick="if(event.target===this) this.classList.remove('open')">
+    <div class="modal modal-sm" style="max-width: 550px">
+      <div class="modal-header">
+        <h2>Order Details <span id="mdlOrderId"
+            style="font-size:0.8rem;color:var(--text3);margin-left:0.5rem;font-family:'JetBrains Mono',monospace"></span>
+        </h2>
+        <button class="modal-close"
+          onclick="document.getElementById('orderDetailModal').classList.remove('open')">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <div
+          style="margin-bottom:1rem;font-size:0.85rem;border-bottom:1px solid var(--border);padding-bottom:1rem;line-height:1.6">
+          <div><strong>Customer:</strong> <span id="mdlCust"></span></div>
+          <div><strong>Email:</strong> <span id="mdlEmail"></span></div>
+          <div><strong>Date:</strong> <span id="mdlDate" style="font-weight:600;color:var(--text)"></span></div>
+          <div><strong>Status:</strong> <span id="mdlStatus" class="ostatus"
+              style="float:none;display:inline-block;margin-left:5px"></span></div>
+          <div style="margin-top:4px"><strong>Payment Method:</strong> <span id="mdlPayment"
+              style="font-weight:700;color:var(--accent);text-transform:uppercase"></span></div>
+        </div>
+        <div id="mdlExtra"></div>
+        <div style="font-weight:700;margin-bottom:0.5rem;font-size:0.9rem">Items</div>
+        <div id="mdlItems"
+          style="background:var(--s2);padding:1rem;border-radius:8px;max-height:300px;overflow-y:auto;margin-bottom:1.5rem">
+        </div>
+        <div
+          style="display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:1.1rem;border-top:1px solid var(--border);padding-top:1rem">
+          <span>Total</span>
+          <span id="mdlTotal" style="color:#16a34a;font-family:'JetBrains Mono',monospace"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="javascript/supabase-client.js"></script>
+  <script src="javascript/supabase-sync.js"></script>
+  <script src="javascript/notifications.js"></script>
+  <script src="javascript/messaging.js"></script>
+  <script src="javascript/auth-modal.js"></script>
+
+  <!-- Chart.js from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+
+  <script src="javascript/owner.js"></script>
+</body>
+
+</html>
